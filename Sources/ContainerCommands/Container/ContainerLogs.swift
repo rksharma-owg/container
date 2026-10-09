@@ -57,7 +57,7 @@ extension Application {
             )
         }
 
-        private static func tail(
+        static func tail(
             fh: FileHandle,
             n: Int?,
             follow: Bool
@@ -88,18 +88,15 @@ extension Application {
                 }
             } else {
                 // Fast path if all they want is the full file.
-                guard let data = try fh.readToEnd() else {
-                    // Seems you get nil if it's a zero byte read, or you
-                    // try and read from dev/null.
-                    return
+                if let data = try fh.readToEnd() {
+                    guard let str = String(data: data, encoding: .utf8) else {
+                        throw ContainerizationError(
+                            .internalError,
+                            message: "failed to convert container logs to utf8"
+                        )
+                    }
+                    print(str.trimmingCharacters(in: .newlines))
                 }
-                guard let str = String(data: data, encoding: .utf8) else {
-                    throw ContainerizationError(
-                        .internalError,
-                        message: "failed to convert container logs to utf8"
-                    )
-                }
-                print(str.trimmingCharacters(in: .newlines))
             }
 
             fflush(stdout)
