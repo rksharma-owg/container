@@ -1,4 +1,5 @@
 name: Container log follow preflight
+run-name: Validate log follow ${{ inputs.contribution_sha }}
 on:
   workflow_dispatch:
     inputs:
